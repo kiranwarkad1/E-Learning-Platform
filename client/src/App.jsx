@@ -1,11 +1,11 @@
 import './App.css'
-import { Button } from "@/components/ui/button"
+import Login from './pages/login'
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
+   <main>
+       <Login/>
+   </main>
   )
 }
 
