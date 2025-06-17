@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query";
 import {} from "@reduxjs/toolkit/query/react";
 import { register } from "module";
+import { userLoggedIn, userLoggedOut } from "../authSlice";
 
 const USER_API  ="http://localhost:8080/api/v1/user/"
 export const authApi = createApi({
@@ -20,15 +21,22 @@ export const authApi = createApi({
 
         loginUser: builder.mutation({
             query: (inputData) =>({
-                url: "register",
+                url: "login",
                 method: "POST",
                 body:inputData
             }),
-            async onQueryStarted(arg, {queryFulfilled, dispatch}){
+            async onQueryStarted(_, {queryFulfilled, dispatch}){
                 try{
-                    dispatch(user)
+                    const result = await queryFulfilled;
+                    dispatch(userLoggedIn({user:result.data.user}));
+                } catch (error){
+                    console.log(error);
                 }
             }
         })
      })
-})
+});
+export const {
+    userRegisterUserMutation,
+    useLoginUserMutation
+} = authApi;

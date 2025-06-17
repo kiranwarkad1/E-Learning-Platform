@@ -1,5 +1,6 @@
 # dependency folders
 server/node_modules/
+node_modules/
 
 # build outputs
 dist/

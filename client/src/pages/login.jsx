@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -16,10 +16,16 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
+import { userRegisterUserMutation } from '@/features/api/authApi';
+import { useFormState } from 'react-dom';
+import { toast } from 'sonner';
 
 const Login = () => {
     const [signupInput, setSignupInput] = useState({ name: "", email: "", password: "" });
     const [loginInput, setLoginInput] = useState({ email: "", password: "" });
+
+    const [registerUser, { data: registerData, error: registerError, isLoading: registerIsLoading, isSuccess: registerIsSuccess, },] = userRegisterUserMutation()
+    const [loginUser, { data: loginData, error: loginError, isLoading: loginIsLoading, isSuccess: loginIsSuccess, },] = userLoginUserMutation();
 
     const changeInputHandler = (e, type) => {
         const { name, value } = e.target;
@@ -30,11 +36,26 @@ const Login = () => {
         }
     };
 
-    const handleRegistration = (type) => {
+    const handleRegistration = async(type) => {
         const inputData = type === "signup" ? signupInput : loginInput;
-        console.log(inputData);
+        const action = type === "signup" ? registerUser : loginUser;
+        await action (inputData);
     };
 
+    useEffect(()=>{
+      if(registerError){
+        toast.error(rigisterData.data.message || "Signup Failed");
+      }
+      if(registerIsSuccess && registerData){
+        toast.success(registerData.message || "Signup successful." )
+      }
+      if(loginError){
+        toast.error(loginData.data.message || "login Failed");
+      }
+      if(loginIsSuccess && loginData){
+        toast.success(loginData.message || "Login successful." )
+      }
+    },[loginIsLoading,registerIsLoading, loginData,registerData, loginError,registerError,]);
     return (
         <div className="flex items-center w-full justify-center">
             <Tabs defaultValue="Signup" className="w-[400px]">
@@ -87,7 +108,15 @@ const Login = () => {
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button onClick={() => handleRegistration("signup")}>Signup</Button>
+                            <Button disabled={registerIsLoading} onClick={() => handleRegistration("signup")}>
+                             {
+                                registerIsLoading ? (
+                                    <>
+                                    <Loader2 className = "mr-2 h-4 w-4 animate-spin"/> Please wait
+                                    </>
+                                ) : "Signup"
+                             }
+                            </Button>
                         </CardFooter>
                     </Card>
                 </TabsContent>
@@ -125,7 +154,16 @@ const Login = () => {
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button onClick={() => handleRegistration("login")}>Login</Button>
+                            <Button disabled={loginIsLoading} onClick={() => handleRegistration("login")}>
+                              {
+                                loginIsLoading ? (
+                                    <>
+                                    <Loader2 className = "mr-2 h-4 w-4 animate-spin"/> Please wait
+                                    </>
+                                
+                                ) : "Login"
+                              }
+                            </Button>
                         </CardFooter>
                     </Card>
                 </TabsContent>
